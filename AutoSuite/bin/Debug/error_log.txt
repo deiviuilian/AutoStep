@@ -1,0 +1,29 @@
+Data/hora do erro: 25/04/2024 10:55:13
+Exceção: System.InvalidOperationException: Operação entre threads inválida: controle 'btn_mapear' acessado de um thread que não é aquele no qual foi criado.
+   em System.Windows.Forms.Control.get_Handle()
+   em System.Windows.Forms.Control.SetVisibleCore(Boolean value)
+   em System.Windows.Forms.Control.set_Visible(Boolean value)
+   em AutoSuite.Form1.StartProcess() na C:\Users\dmarangoni\source\repos\AutoSuite\AutoSuite\Form1.cs:linha 328
+
+Data/hora do erro: 25/04/2024 11:11:57
+Exceção: System.InvalidOperationException: Operação entre threads inválida: controle 'btn_mapear' acessado de um thread que não é aquele no qual foi criado.
+   em System.Windows.Forms.Control.get_Handle()
+   em System.Windows.Forms.Control.SetVisibleCore(Boolean value)
+   em System.Windows.Forms.Control.set_Visible(Boolean value)
+   em AutoSuite.Form1.StartProcess() na C:\Users\dmarangoni\source\repos\AutoSuite\AutoSuite\Form1.cs:linha 332
+
+Data/hora do erro: 25/04/2024 11:14:20
+Exceção: System.InvalidOperationException: Operação entre threads inválida: controle 'btn_mapear' acessado de um thread que não é aquele no qual foi criado.
+   em System.Windows.Forms.Control.get_Handle()
+   em System.Windows.Forms.Control.SetVisibleCore(Boolean value)
+   em System.Windows.Forms.Control.set_Visible(Boolean value)
+   em AutoSuite.Form1.StartProcess() na C:\Users\dmarangoni\source\repos\AutoSuite\AutoSuite\Form1.cs:linha 330
+
+Data/hora do erro: 25/04/2024 16:05:33
+Exceção: System.InvalidOperationException: Operação entre threads inválida: controle 'Form1' acessado de um thread que não é aquele no qual foi criado.
+   em System.Windows.Forms.Control.get_Handle()
+   em System.Windows.Forms.Control.SetVisibleCore(Boolean value)
+   em System.Windows.Forms.Form.SetVisibleCore(Boolean value)
+   em System.Windows.Forms.Control.set_Visible(Boolean value)
+   em AutoSuite.Form1.StartProcess() na C:\Users\dmarangoni\source\repos\AutoSuite\AutoSuite\Form1.cs:linha 288
+
