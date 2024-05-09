@@ -9,8 +9,11 @@ namespace AutoSuite
     public class Commands
     {
         public string Type { get; set; }
+       
         public dynamic Value { get; set; }
 
         public int Step { get; set; }
+
+        public string NomeAutomacao { get; set; }
     }
 }

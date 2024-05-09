@@ -27,3 +27,23 @@ Exceção: System.InvalidOperationException: Operação entre threads inválida:
    em System.Windows.Forms.Control.set_Visible(Boolean value)
    em AutoSuite.Form1.StartProcess() na C:\Users\dmarangoni\source\repos\AutoSuite\AutoSuite\Form1.cs:linha 288
 
+Data/hora do erro: 03/05/2024 15:52:18
+Exceção: Microsoft.CSharp.RuntimeBinder.RuntimeBinderException: A melhor correspondência de método sobrecarregado 'System.Windows.Forms.SendKeys.SendWait(string)' tem alguns argumentos inválidos
+   em CallSite.Target(Closure , CallSite , Type , Object )
+   em System.Dynamic.UpdateDelegates.UpdateAndExecuteVoid2[T0,T1](CallSite site, T0 arg0, T1 arg1)
+   em AutoSuite.Form1.StartProcess() na C:\Users\dmarangoni\source\repos\AutoStep\AutoSuite\Form1.cs:linha 330
+
+Data/hora do erro: 03/05/2024 17:43:11
+Exceção: System.InvalidOperationException: Não é possível chamar Invoke ou BeginInvoke em um controle antes da criação do identificador de janela.
+   em System.Windows.Forms.Control.MarshaledInvoke(Control caller, Delegate method, Object[] args, Boolean synchronous)
+   em System.Windows.Forms.Control.Invoke(Delegate method, Object[] args)
+   em System.Windows.Forms.Control.Invoke(Delegate method)
+   em AutoSuite.Form1.StartProcess() na C:\Users\dmarangoni\source\repos\AutoStep\AutoSuite\Form1.cs:linha 349
+
+Data/hora do erro: 03/05/2024 17:43:12
+Exceção: System.InvalidOperationException: Não é possível chamar Invoke ou BeginInvoke em um controle antes da criação do identificador de janela.
+   em System.Windows.Forms.Control.MarshaledInvoke(Control caller, Delegate method, Object[] args, Boolean synchronous)
+   em System.Windows.Forms.Control.Invoke(Delegate method, Object[] args)
+   em System.Windows.Forms.Control.Invoke(Delegate method)
+   em AutoSuite.Form1.StartProcess() na C:\Users\dmarangoni\source\repos\AutoStep\AutoSuite\Form1.cs:linha 349
+
