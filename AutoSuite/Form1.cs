@@ -1,9 +1,11 @@
-﻿using OfficeOpenXml;
+﻿using AutoSuite.Conexao;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -21,14 +23,20 @@ namespace AutoSuite
         private List<Tuple<int, string, string>> listaDeValores = new List<Tuple<int, string, string>>();
         List<Commands> commands = new List<Commands>();
         private bool start_mapeamento = false;
-        public int stepe = 1;        
+        public int stepe = 1;
+       
+        private Thread processThread;
 
         public Form1()
         {
             InitializeComponent();
+            CarregarNomesAutomacao();
             CenterToScreen();
 
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+            new DraggableForm(this);
+                               
         }       
 
         private void btn_importar_Click(object sender, EventArgs e)
@@ -260,16 +268,15 @@ namespace AutoSuite
         }
 
         private void btn_start_Click(object sender, EventArgs e)
-        {
-           
-
+        {    
             if (commands.Count == 0)
             {
                 MessageBox.Show("Nenhum comando foi carregado. Por favor, importe ou adicione comandos antes de iniciar o processo.");
                 return;
             }
+         
 
-            this.Hide();
+            Hide();       
 
             new Thread(new ThreadStart(StartProcess)).Start();
         }
@@ -283,10 +290,9 @@ namespace AutoSuite
 
         private void StartProcess()
         {
-            
-
+           
             try
-            {         
+            {
 
                 if (commands.Count == 0)
                 {
@@ -301,7 +307,7 @@ namespace AutoSuite
                         this.Invoke((MethodInvoker)delegate
                         {
                             this.Cursor = new Cursor(Cursor.Current.Handle);
-                            Thread.Sleep(1000);
+                            Thread.Sleep(3000);
                             if (command.Value is System.Drawing.Point point)
                             {
                                 Cursor.Position = point;
@@ -341,8 +347,11 @@ namespace AutoSuite
                     btn_add_text.Enabled  = true;
                     btn_add_enter.Enabled  = true;
                     btn_limpa1.Enabled  = true;
-                    btn_limpar.Enabled  = true;
-                    this.Show();
+                    btn_limpar.Enabled  = true;                  
+                           
+                    // Exibe o formulário novamente
+                    ShowForm();
+
                 });
             }
             catch (Exception ex)
@@ -362,8 +371,35 @@ namespace AutoSuite
                 // Encerra o processo
                 return;
             }
+
          
+
         }
+
+
+        private void ShowForm()
+        {
+            // Exibe o formulário
+            if (InvokeRequired)
+            {
+                Invoke(new MethodInvoker(delegate { Show(); }));
+            }
+            else
+            {
+                Show();
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            // Garante que a thread do processo é encerrada ao fechar o formulário
+            if (processThread != null && processThread.IsAlive)
+            {
+                processThread.Abort();
+            }
+            base.OnFormClosing(e);
+        }
+
 
         private void btn_limpar_Click(object sender, EventArgs e)
         {
@@ -449,5 +485,146 @@ namespace AutoSuite
         {
             Application.Exit();
         }
+
+
+
+        private void btn_salvar_Click(object sender, EventArgs e)
+        {
+            string nomeAutomacao = insert_nameauto.Text;
+
+            bool sucessoTotal = true;
+
+            TableAutomation tableAutomation = new TableAutomation();
+            foreach (var command in commands)
+            {
+                Commands automacao = new Commands
+                {
+                    Type = command.Type,
+                    Value = command.Value,
+                    Step = command.Step
+                };
+
+                bool sucesso = tableAutomation.Add(automacao, nomeAutomacao);
+
+                if (!sucesso)
+                {
+                    sucessoTotal = false;
+                }             
+
+            }
+
+            if (sucessoTotal)
+            {
+                MessageBox.Show("Salvo com sucesso!");
+            }
+            else
+            {
+                MessageBox.Show("Erro ao salvar!");
+            }
+
+            CarregarNomesAutomacao();
+        }
+
+       
+
+        private void select_automacao_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            insert_nameauto.Clear();
+
+            if (select_automacao.SelectedItem != null)
+            {
+                string nomeAutomacao = select_automacao.SelectedItem.ToString();
+                // Chama o método Get da classe TableAutomation para obter os comandos para a automação selecionada
+                var tableAutomation = new TableAutomation();
+                var Comandos = tableAutomation.Get(nomeAutomacao);
+
+                // Exibe os comandos na ListView
+                ExibirComandosNaListView(Comandos);
+            }
+            
+        }
+
+        private void ExibirComandosNaListView(List<Commands> Comandos)
+        {
+            lv_itens.Items.Clear(); // Limpar itens existentes na ListView
+
+            
+            foreach (var command in Comandos)
+            {
+                string[] values;
+                string tipo = command.Type.ToString();
+                string valor = command.Value.ToString();
+
+                if (command.Type == "Click")
+                {
+                    // Se o comando for um clique, exiba as coordenadas X e Y
+                    string[] coordinates = command.Value.Split(',');
+
+                    int x = int.Parse(coordinates[0].Trim());
+                    int y = int.Parse(coordinates[1].Trim());
+                    System.Drawing.Point point = new System.Drawing.Point(x, y);
+                    values = new string[] { command.Step.ToString(), "Click", $"{point.X}, {point.Y}" };
+                    commands.Add(new Commands { Step = command.Step, Type = tipo, Value = point });
+
+                }
+                else
+                {
+                    // Para outros tipos de comandos, exiba o número, o tipo e o valor
+                    values = new string[] { command.Step.ToString(), command.Type, command.Value.ToString() };
+                    commands.Add(new Commands { Step = command.Step, Type = tipo, Value = valor });
+                }
+
+               
+           
+                // Adiciona os comandos que não precisam de tratamento especial diretamente à lista
+              
+
+                lv_itens.Items.Add(new ListViewItem(values));
+            }
+        }
+
+        private void CarregarNomesAutomacao()
+        {
+
+            var tableAutomation = new TableAutomation();
+            // Obtém os nomes distintos de automação
+
+            List<string> NomeAutomacao = tableAutomation.GetDistinctNames();
+
+            select_automacao.Items.Clear();
+
+            foreach (var nomeAutomacao in NomeAutomacao)
+            {
+                select_automacao.Items.Add(nomeAutomacao);
+            }
+
+            select_automacao.Refresh();
+        }
+
+        private void btn_excluir_Click(object sender, EventArgs e)
+        {
+            if (select_automacao.SelectedItem != null)
+            {
+                string nomeAutomacao = select_automacao.SelectedItem.ToString();
+                // Chama o método Get da classe TableAutomation para obter os comandos para a automação selecionada
+                var tableAutomation = new TableAutomation();
+                tableAutomation.Delete(nomeAutomacao);
+
+            }
+
+            lv_itens.Items.Clear();
+            insert_nameauto.Clear();
+            select_automacao.SelectedItem = null;
+            CarregarNomesAutomacao();
+            MessageBox.Show("Automação Excluída!");
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Carrega os nomes de automação no campo de seleção
+            CarregarNomesAutomacao();
+        }
+
+       
     }
 }
